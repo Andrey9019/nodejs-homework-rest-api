@@ -26,6 +26,20 @@ export const addContact = async (data) => {
   return newContact;
 };
 
+const updateContacts = (contacts) =>
+  fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
+
+export const updateContactsById = async (id, data) => {
+  const contacts = await listContacts();
+  const index = contacts.findIndex((item) => item.id === id);
+  if (index === -1) {
+    return null;
+  }
+  contacts[index] = { ...contacts[index], ...data };
+  await updateContacts(contacts);
+  return contacts[index];
+};
+
 export const removeContact = async (contactId) => {
   const contacts = await listContacts();
   const idx = contacts.findIndex((item) => item.id === contactId);
