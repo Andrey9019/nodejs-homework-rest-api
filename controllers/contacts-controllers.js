@@ -53,7 +53,7 @@ const updateBiId = async (req, res, next) => {
     const { id } = req.params;
     const result = await contactsServise.updateContactsById(id, req.body);
     if (!result) {
-      throw HttpError(404, `Movie with id=${id} not found`);
+      throw HttpError(404, `Contact with id=${id} not found`);
     }
     res.json(result);
   } catch (error) {
