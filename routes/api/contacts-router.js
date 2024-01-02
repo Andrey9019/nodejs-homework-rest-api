@@ -1,36 +1,42 @@
 import express from "express";
-
-import contactsControllers from "../../controllers/contacts-controllers.js";
-
-import { isEmptyBody } from "../../middlewares/index.js";
-
 import { validateBody } from "../../decorators/index.js";
-
+import { isEmptyBody, isValidId } from "../../middlewares/index.js";
+import contactsControllers from "../../controllers/contacts-controllers.js";
 import {
-  contactAddShema,
-  contactUpdateShema,
-} from "../../shemas/contact-shemas.js";
+  contactAddSchema,
+  contactUpdateSchema,
+  contactUpdateFavoriteSchema,
+} from "../../models/Contact.js";
 
 const contactsRouter = express.Router();
 
 contactsRouter.get("/", contactsControllers.listContacts);
 
-// contactsRouter.get("/:id", contactsControllers.getContactById);
+contactsRouter.get("/:id", isValidId, contactsControllers.getContactById);
 
-// contactsRouter.post(
-//   "/",
-//   isEmptyBody,
-//   validateBody(contactAddShema),
-//   contactsControllers.addContact
-// );
+contactsRouter.post(
+  "/",
+  isEmptyBody,
+  validateBody(contactAddSchema),
+  contactsControllers.addContact
+);
 
-// contactsRouter.put(
-//   "/:id",
-//   isEmptyBody,
-//   validateBody(contactUpdateShema),
-//   contactsControllers.updateBiId
-// );
+contactsRouter.put(
+  "/:id",
+  isValidId,
+  isEmptyBody,
+  validateBody(contactUpdateSchema),
+  contactsControllers.updateBiId
+);
 
-// contactsRouter.delete("/:id", contactsControllers.deleteByID);
+contactsRouter.patch(
+  "/:id/favorite",
+  isValidId,
+  isEmptyBody("missing field favorite"),
+  validateBody(contactUpdateFavoriteSchema),
+  contactsControllers.updateBiId
+);
+
+contactsRouter.delete("/:id", isValidId, contactsControllers.deleteByID);
 
 export default contactsRouter;
