@@ -16,7 +16,7 @@ contactsRouter.get("/:id", isValidId, contactsControllers.getContactById);
 
 contactsRouter.post(
   "/",
-  isEmptyBody,
+  isEmptyBody("missing fields"),
   validateBody(contactAddSchema),
   contactsControllers.addContact
 );
@@ -24,7 +24,7 @@ contactsRouter.post(
 contactsRouter.put(
   "/:id",
   isValidId,
-  isEmptyBody,
+  isEmptyBody("missing fields"),
   validateBody(contactUpdateSchema),
   contactsControllers.updateBiId
 );
