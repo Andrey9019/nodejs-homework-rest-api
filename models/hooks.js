@@ -6,4 +6,5 @@ export const handeleSaveError = (error, data, next) => {
 export const addUpdateSettings = function (next) {
   this.options.new = true;
   this.options.runValidators = true;
+  next();
 };
