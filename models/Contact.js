@@ -1,5 +1,7 @@
 import Joi from "joi";
+
 import { Schema, model } from "mongoose";
+
 import { addUpdateSettings, handeleSaveError } from "./hooks.js";
 
 const contactSchema = new Schema(
