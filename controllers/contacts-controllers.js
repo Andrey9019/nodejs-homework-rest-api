@@ -5,14 +5,18 @@ import { HttpError } from "../helpers/index.js";
 import { ctrlWrapper } from "../decorators/index.js";
 
 const listContacts = async (req, res) => {
-  const result = await Contact.find({}, "name email phone favorite");
+  const { _id: owner } = req.user;
+
+  const result = await Contact.find({ owner }, "name email phone favorite");
 
   res.json(result);
 };
 
 const getContactById = async (req, res) => {
-  const { id } = req.params;
-  const result = await Contact.findById(id);
+  const { id: _id } = req.params;
+  const { _id: owner } = req.user;
+
+  const result = await User.findOne({ _id, owner });
 
   if (!result) {
     throw HttpError(404, `Contact width id=${id} not found`);
@@ -21,13 +25,15 @@ const getContactById = async (req, res) => {
 };
 
 const addContact = async (req, res) => {
-  const result = await Contact.create(req.body);
+  const { _id: owner } = req.user;
+  const result = await Contact.create({ ...req.body, owner });
   res.status(201).json(result);
 };
 
 const updateBiId = async (req, res) => {
-  const { id } = req.params;
-  const result = await Contact.findByIdAndUpdate(id, req.body);
+  const { id: _id } = req.params;
+  const { _id: owner } = req.user;
+  const result = await Contact.findOneAndUpdate({ _id, owner }, req.body);
   if (!result) {
     throw HttpError(404, `Contact with id=${id} not found`);
   }
@@ -35,8 +41,9 @@ const updateBiId = async (req, res) => {
 };
 
 const deleteByID = async (req, res) => {
-  const { id } = req.params;
-  const result = await Contact.findByIdAndDelete(id);
+  const { id: _id } = req.params;
+  const { _id: owner } = req.user;
+  const result = await Contact.findOneAndDelete({ _id, owner });
   if (!result) {
     throw HttpError(404);
   }

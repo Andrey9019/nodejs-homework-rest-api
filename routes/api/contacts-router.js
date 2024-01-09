@@ -2,7 +2,11 @@ import express from "express";
 
 import { validateBody } from "../../decorators/index.js";
 
-import { isEmptyBody, isValidId } from "../../middlewares/index.js";
+import {
+  isEmptyBody,
+  isValidId,
+  authenticate,
+} from "../../middlewares/index.js";
 
 import contactsControllers from "../../controllers/contacts-controllers.js";
 
@@ -13,6 +17,8 @@ import {
 } from "../../models/Contact.js";
 
 const contactsRouter = express.Router();
+
+contactsRouter.use(authenticate);
 
 contactsRouter.get("/", contactsControllers.listContacts);
 
