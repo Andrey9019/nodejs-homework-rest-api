@@ -2,7 +2,7 @@ import express from "express";
 
 import { validateBody } from "../../decorators/index.js";
 
-import { isEmptyBody, isValidId } from "../../middlewares/index.js";
+import { isEmptyBody, authenticate } from "../../middlewares/index.js";
 
 import { userSignupSchema, userSigninSchema } from "../../models/User.js";
 
@@ -23,5 +23,7 @@ authRouter.post(
   validateBody(userSigninSchema),
   authController.signin
 );
+
+authRouter.get("/current", authenticate, authController.getCurrent);
 
 export default authRouter;
