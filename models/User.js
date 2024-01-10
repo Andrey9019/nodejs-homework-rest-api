@@ -24,8 +24,10 @@ const userSchema = new Schema(
       enum: subscriptionList,
       default: "starter",
     },
-    token: String,
-    // default: null,
+    token: {
+      type: String,
+      // default: null,
+    },
   },
   { versionKey: false, timestamps: true }
 );
