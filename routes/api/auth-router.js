@@ -4,28 +4,28 @@ import { validateBody } from "../../decorators/index.js";
 
 import { isEmptyBody, authenticate } from "../../middlewares/index.js";
 
-import { userSignupSchema, userSigninSchema } from "../../models/User.js";
+import { userRegisterSchema, userLoginSchema } from "../../models/User.js";
 
 import authController from "../../controllers/auth-controller.js";
 
 const authRouter = express.Router();
 
 authRouter.post(
-  "/signup",
+  "/register",
   isEmptyBody("missing fields"),
-  validateBody(userSignupSchema),
-  authController.signup
+  validateBody(userRegisterSchema),
+  authController.register
 );
 
 authRouter.post(
-  "/signin",
+  "/login",
   isEmptyBody("missing fields"),
-  validateBody(userSigninSchema),
-  authController.signin
+  validateBody(userLoginSchema),
+  authController.login
 );
 
 authRouter.get("/current", authenticate, authController.getCurrent);
 
-authRouter.post("/signout", authenticate, authController.singout);
+authRouter.post("/logout", authenticate, authController.logout);
 
 export default authRouter;

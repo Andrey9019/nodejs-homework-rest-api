@@ -36,14 +36,14 @@ userSchema.post("save", handeleSaveError);
 userSchema.pre("findOneAndUpdate", addUpdateSettings);
 userSchema.post("findOneAndUpdate", handeleSaveError);
 
-export const userSignupSchema = Joi.object({
+export const userRegisterSchema = Joi.object({
   password: Joi.string().required(),
   email: Joi.string().pattern(emailRegex).required(),
   subscription: Joi.string().valid(...subscriptionList),
   token: Joi.string(),
 });
 
-export const userSigninSchema = Joi.object({
+export const userLoginSchema = Joi.object({
   password: Joi.string().required(),
   email: Joi.string().pattern(emailRegex).required(),
 });
