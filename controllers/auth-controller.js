@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import gravatar from "gravatar";
 import path from "path";
-import fs from "fs";
+import fs from "fs/promises";
 import Jimp from "jimp";
 
 import { HttpError } from "../helpers/index.js";
@@ -69,14 +69,11 @@ const logout = async (req, res) => {
 };
 
 const updateAvatar = async (req, res) => {
-  if (!req.file) {
-    throw HttpError(400, "File not found");
-  }
-
   const { _id: id } = req.user;
   const { path: oldPath, filename } = req.file;
 
   const avatar = await Jimp.read(oldPath);
+
   avatar.resize(250, 250).write(oldPath);
 
   const newName = `${id}_${filename}`;
@@ -84,9 +81,9 @@ const updateAvatar = async (req, res) => {
   const newPath = path.join(avatarPath, newName);
 
   fs.rename(oldPath, newPath);
-  const avatarURL = path.join("avatars", newName);
 
-  const changes = await UserModel.findByIdAndUpdate(id, { avatarURL });
+  const avatarURL = path.join("avatars", newName);
+  const changes = await User.findByIdAndUpdate(id, { avatarURL });
 
   res.json({ avatarURL: changes.avatarURL });
 };
