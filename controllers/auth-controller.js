@@ -1,8 +1,14 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import User from "../models/User.js";
+import gravatar from "gravatar";
+import path from "path";
+import fs from "fs";
+import Jimp from "jimp";
+
 import { HttpError } from "../helpers/index.js";
 import { ctrlWrapper } from "../decorators/index.js";
+
+import User from "../models/User.js";
 
 const { JWT_SECRET } = process.env;
 
@@ -14,7 +20,13 @@ const register = async (req, res) => {
   }
   const hashPassword = await bcrypt.hash(password, 10);
 
-  const newUser = await User.create({ ...req.body, password: hashPassword });
+  const avatarURL = gravatar.url(email);
+
+  const newUser = await User.create({
+    ...req.body,
+    password: hashPassword,
+    avatarURL,
+  });
 
   res.status(201).json({
     user: {
@@ -56,9 +68,33 @@ const logout = async (req, res) => {
   res.status(204).json();
 };
 
+const updateAvatar = async (req, res) => {
+  if (!req.file) {
+    throw HttpError(400, "File not found");
+  }
+
+  const { _id: id } = req.user;
+  const { path: oldPath, filename } = req.file;
+
+  const avatar = await Jimp.read(oldPath);
+  avatar.resize(250, 250).write(oldPath);
+
+  const newName = `${id}_${filename}`;
+  const avatarPath = path.resolve("public", "avatars");
+  const newPath = path.join(avatarPath, newName);
+
+  fs.rename(oldPath, newPath);
+  const avatarURL = path.join("avatars", newName);
+
+  const changes = await UserModel.findByIdAndUpdate(id, { avatarURL });
+
+  res.json({ avatarURL: changes.avatarURL });
+};
+
 export default {
   register: ctrlWrapper(register),
   login: ctrlWrapper(login),
   getCurrent: ctrlWrapper(getCurrent),
   logout: ctrlWrapper(logout),
+  updateAvatar: ctrlWrapper(updateAvatar),
 };
