@@ -68,24 +68,29 @@ const logout = async (req, res) => {
   res.status(204).json();
 };
 
+const avatarsDir = path.resolve("public", "avatars");
+
 const updateAvatar = async (req, res) => {
-  const { _id: id } = req.user;
-  const { path: oldPath, filename } = req.file;
+  if (!req.file) {
+    res.status(400).json({ message: "No file uploaded" });
+  }
+  const { _id } = req.user;
+  const { path: oldPath, originalname } = req.file;
+  const filename = `${_id}_${originalname}`;
+  const resultUpload = path.join(avatarsDir, filename);
 
-  const avatar = await Jimp.read(oldPath);
+  await fs.rename(oldPath, resultUpload);
 
-  avatar.resize(250, 250).write(oldPath);
+  const avatarURL = path.join("avatars", filename);
 
-  const newName = `${id}_${filename}`;
-  const avatarPath = path.resolve("public", "avatars");
-  const newPath = path.join(avatarPath, newName);
+  await User.findByIdAndUpdate(_id, { avatarURL });
 
-  fs.rename(oldPath, newPath);
+  const avatar = await Jimp.read(resultUpload);
+  avatar.resize(250, 250).writeAsync(resultUpload);
 
-  const avatarURL = path.join("avatars", newName);
-  const changes = await User.findByIdAndUpdate(id, { avatarURL });
-
-  res.json({ avatarURL: changes.avatarURL });
+  res.json({
+    avatarURL,
+  });
 };
 
 export default {
