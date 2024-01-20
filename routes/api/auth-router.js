@@ -4,7 +4,11 @@ import { validateBody } from "../../decorators/index.js";
 
 import { isEmptyBody, authenticate, upload } from "../../middlewares/index.js";
 
-import { userRegisterSchema, userLoginSchema } from "../../models/User.js";
+import {
+  userRegisterSchema,
+  userLoginSchema,
+  userVerifySchema,
+} from "../../models/User.js";
 
 import authController from "../../controllers/auth-controller.js";
 
@@ -22,6 +26,15 @@ authRouter.post(
   isEmptyBody("missing fields"),
   validateBody(userLoginSchema),
   authController.login
+);
+
+authRouter.get("/verify/:verificationToken", authController.verify);
+
+authRouter.post(
+  "/verify",
+  isEmptyBody("missing fields"),
+  validateBody(userVerifySchema),
+  authController.resendVerifyEmail
 );
 
 authRouter.get("/current", authenticate, authController.getCurrent);
